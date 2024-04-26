@@ -21,7 +21,8 @@ pub async fn upsert_post(
     title: String,
     text: String,
 ) -> Result<String, ServerFnError> {
-    let pool: Data<Pool<Sqlite>> = extract().await?;
+    let data: Data<Pool<Sqlite>> = extract().await?;
+    let pool = data.get_ref().clone();
 
     sqlx::query("")
         .bind(&id)
@@ -29,8 +30,7 @@ pub async fn upsert_post(
         .bind(&image_url)
         .bind(&title)
         .bind(&text)
-        .bind(&pool.acquire())
-        .await?;
+        .fetch_all(&pool);
 
     Ok(String::from("placeholder"))
 }
