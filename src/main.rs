@@ -6,6 +6,8 @@ async fn main() -> std::io::Result<()> {
     use leptos::*;
     use leptos_actix::{generate_route_list, LeptosRoutes};
     use leptos_moonbound::app::*;
+    use sqlx::{migrate, sqlite::SqlitePoolOptions};
+    use std::io;
 
     let conf = get_configuration(None).await.unwrap();
     let addr = conf.leptos_options.site_addr;
@@ -13,11 +15,22 @@ async fn main() -> std::io::Result<()> {
     let routes = generate_route_list(App);
     println!("listening on http://{}", &addr);
 
+    let db_pool = SqlitePoolOptions::new()
+        .connect("sqlite:post.db")
+        .await
+        .map_err(|e| io::Error::new(io::ErrorKind::Other, e))?;
+
+    migrate!("./src/migrations")
+        .run(&db_pool)
+        .await
+        .expect("Could not run sqlx migration");
+
     HttpServer::new(move || {
         let leptos_options = &conf.leptos_options;
         let site_root = &leptos_options.site_root;
 
         App::new()
+            .app_data(web::Data::new(db_pool.clone()))
             // serve JS/WASM/CSS from `pkg`
             .service(Files::new("/pkg", format!("{site_root}/pkg")))
             // serve other assets from the `assets` directory
