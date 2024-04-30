@@ -60,8 +60,8 @@ pub async fn get_post(id: String) -> Result<Post, ServerFnError> {
 
 #[server(GetPreviews, "/api")]
 pub async fn get_previews(
-    oldest: Option<String>,
-    newest: Option<String>,
+    _oldest: Option<String>,
+    _newest: Option<String>,
     preview_length: u8,
     page_size: u8,
 ) -> Result<Vec<Post>, ServerFnError> {
