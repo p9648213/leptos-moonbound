@@ -23,6 +23,7 @@ sqlx = { version = "0.7.4", features = [
   "sqlite",
   "chrono",
 ], optional = true }
+uuid = { version = "1.8.0", optional = true, features = ["v4"] }
 
 [features]
 csr = ["leptos/csr", "leptos_meta/csr", "leptos_router/csr"]
@@ -32,6 +33,7 @@ ssr = [
   "dep:actix-web",
   "dep:leptos_actix",
   "dep:sqlx",
+  "dep:uuid",
   "leptos/ssr",
   "leptos_meta/ssr",
   "leptos_router/ssr",
